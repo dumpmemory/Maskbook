@@ -1,4 +1,4 @@
-import { Tab, Tabs, Box, Typography, IconButton, Stack } from '@material-ui/core'
+import { Tab, Tabs, Box, Typography, IconButton, Stack, Paper } from '@material-ui/core'
 import { makeStyles } from '@masknet/theme'
 import { PageFrame } from '../../components/DashboardFrame'
 import { useEffect, useState } from 'react'
@@ -12,6 +12,7 @@ import { PersonaContext } from './hooks/usePersonaContext'
 import { useDashboardI18N } from '../../locales'
 import type { PersonaInformation } from '@masknet/shared'
 import { ContentContainer } from '../../components/ContentContainer'
+import { PersonaRowCard } from './components/PersonaCard/Row'
 
 const useStyles = makeStyles()((theme) => ({
     tabPanel: {
@@ -64,6 +65,7 @@ function Personas() {
     return (
         <PageFrame
             title={t.personas()}
+            noBackgroundFill={true}
             primaryAction={
                 <Box display="flex" alignItems="center">
                     <AuthorIcon onClick={toggleDrawer} className={classes.author} />
@@ -77,6 +79,9 @@ function Personas() {
                     </IconButton>
                 </Box>
             }>
+            <Paper variant="rounded" sx={{ mb: 3, p: 4 }}>
+                <PersonaRowCard />
+            </Paper>
             <ContentContainer>
                 <TabContext value={activeTab}>
                     <Tabs value={!!activeTab ? activeTab : false} onChange={(event, tab) => setActiveTab(tab)}>
@@ -84,7 +89,7 @@ function Personas() {
                             <Tab
                                 key={networkIdentifier}
                                 value={networkIdentifier}
-                                // They should be localized
+                                // They should be localizedh
                                 label={capitalize(networkIdentifier.replace('.com', ''))}
                             />
                         ))}
