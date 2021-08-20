@@ -1,4 +1,4 @@
-import { makeStyles, Theme } from '@material-ui/core/styles'
+import { makeStyles } from '@masknet/theme'
 import { Button, ListItem, ListItemIcon, ListItemText, Typography } from '@material-ui/core'
 import classNames from 'classnames'
 import {
@@ -15,7 +15,7 @@ import { some } from 'lodash-es'
 import { useCallback } from 'react'
 
 // todo: change Typography from global theme
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme) => ({
     icon: {
         width: 36,
         height: 36,
@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 export const getERC20TokenListItem =
     (addedTokens: FungibleTokenDetailed[], externalTokens: FungibleTokenDetailed[], account?: string) =>
     ({ data, onSelect }: MaskSearchableListItemProps<Asset>) => {
-        const classes = useStyles()
+        const { classes } = useStyles()
         const { addERC20Token, trustERC20Token } = useWeb3Context()
         const token = data.token
 
