@@ -1,4 +1,4 @@
-import { Tab, Tabs, Box, Typography, IconButton } from '@material-ui/core'
+import { Tab, Tabs, Box, Typography, IconButton, Stack } from '@material-ui/core'
 import { makeStyles } from '@masknet/theme'
 import { PageFrame } from '../../components/DashboardFrame'
 import { useEffect, useState } from 'react'
@@ -96,11 +96,16 @@ function Personas() {
                         )
                         if (profile) return <TabPanel key={networkIdentifier} value={networkIdentifier} />
                         return (
-                            <TabPanel key={networkIdentifier} value={networkIdentifier} sx={{ flex: 1 }}>
-                                <PersonaSetup
-                                    networkIdentifier={networkIdentifier}
-                                    onConnect={() => connectPersona(currentPersona.identifier, networkIdentifier)}
-                                />
+                            <TabPanel
+                                key={networkIdentifier}
+                                value={networkIdentifier}
+                                sx={{ flex: 1, height: 'calc(100% - 48px)' }}>
+                                <Stack alignItems="center" height="100%">
+                                    <PersonaSetup
+                                        networkIdentifier={networkIdentifier}
+                                        onConnect={() => connectPersona(currentPersona.identifier, networkIdentifier)}
+                                    />
+                                </Stack>
                             </TabPanel>
                         )
                     })}
