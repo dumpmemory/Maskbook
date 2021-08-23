@@ -147,6 +147,7 @@
     "personas_back_up": "Back Up",
     "personas_connect_to": "Connect to {{internalName}}",
     "personas_disconnect": "Disconnect",
+    "personas_add": "Add",
     "personas_rename": "Rename",
     "settings_general": "General",
     "settings_backup_recovery": "Backup & Recovery",
