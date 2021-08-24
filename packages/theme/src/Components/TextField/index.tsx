@@ -50,11 +50,11 @@ const useStyles = makeStyles()((theme) => ({
 type MaskTextFieldProps = Exclude<StandardTextFieldProps, 'variant'>
 
 export const MaskTextField = forwardRef((props: MaskTextFieldProps, ref: ForwardedRef<any>) => {
-    const { label, required = false, ...rest } = props
+    const { label, required = false, sx, ...rest } = props
     const inputProps = (props.inputProps as InputProps) ?? {}
     const { classes } = useStyles()
     return (
-        <Box>
+        <Box sx={sx}>
             {label && typeof label === 'string' && (
                 <Typography sx={{ mb: 1 }} variant="body2" className={classes.label}>
                     {label}
