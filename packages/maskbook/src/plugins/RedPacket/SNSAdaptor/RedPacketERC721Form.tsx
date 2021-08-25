@@ -139,7 +139,7 @@ export function RedPacketERC721Form(props: RedPacketERC721FormProps) {
     const [message, setMessage] = useState('')
     const [offset, setOffset] = useState(0)
     const {
-        asyncRetry: { value = { tokenDetailedOwnerList: [], loadMore: true } },
+        asyncRetry: { value = { tokenDetailedOwnerList: [], loadMore: true }, loading: loadingOwnerList },
         clearTokenDetailedOwnerList,
     } = useERC721TokenDetailedOwnerList(contract, account, offset)
 
@@ -209,6 +209,7 @@ export function RedPacketERC721Form(props: RedPacketERC721FormProps) {
                     existTokenDetailedList={existTokenDetailedList}
                     setExistTokenDetailedList={setExistTokenDetailedList}
                     tokenDetailedOwnerList={tokenDetailedOwnerList}
+                    loadingOwnerList={loadingOwnerList}
                     addOffset={addOffset}
                 />
             ) : null}
