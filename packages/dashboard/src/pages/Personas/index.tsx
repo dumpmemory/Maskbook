@@ -12,6 +12,7 @@ import { PersonaContext } from './hooks/usePersonaContext'
 import { useDashboardI18N } from '../../locales'
 import type { PersonaInformation } from '@masknet/shared'
 import { ContentContainer } from '../../components/ContentContainer'
+import { PostHistory } from './components/PostHistory'
 
 const useStyles = makeStyles()((theme) => ({
     tabPanel: {
@@ -52,6 +53,12 @@ function Personas() {
     const t = useDashboardI18N()
     const { drawerOpen, toggleDrawer, personas, currentPersona, connectPersona, definedSocialNetworks } =
         PersonaContext.useContainer()
+
+    const getUserIds = (network: string) => {
+        return currentPersona?.linkedProfiles
+            .filter((x) => x.identifier.network === network)
+            .map((x) => x.identifier.userId)
+    }
 
     const [activeTab, setActiveTab] = useState(
         firstProfileNetwork(currentPersona) ?? definedSocialNetworks[0].networkIdentifier,
@@ -94,7 +101,15 @@ function Personas() {
                         const profile = currentPersona.linkedProfiles.find(
                             (x) => x.identifier.network === networkIdentifier,
                         )
-                        if (profile) return <TabPanel key={networkIdentifier} value={networkIdentifier} />
+                        if (profile)
+                            return (
+                                <TabPanel key={networkIdentifier} value={networkIdentifier}>
+                                    <PostHistory
+                                        useIds={getUserIds(networkIdentifier) ?? []}
+                                        network={networkIdentifier}
+                                    />
+                                </TabPanel>
+                            )
                         return (
                             <TabPanel key={networkIdentifier} value={networkIdentifier} sx={{ flex: 1 }}>
                                 <PersonaSetup

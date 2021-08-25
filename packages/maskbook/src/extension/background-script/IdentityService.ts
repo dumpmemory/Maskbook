@@ -1,5 +1,12 @@
 import * as bip39 from 'bip39'
-import { personaRecordToPersona, queryPersona, queryProfile, queryProfilesWithQuery, storeAvatar } from '../../database'
+import {
+    personaRecordToPersona,
+    queryPersona,
+    queryPostsDB,
+    queryProfile,
+    queryProfilesWithQuery,
+    storeAvatar,
+} from '../../database'
 import {
     ECKeyIdentifier,
     ECKeyIdentifierFromJsonWebKey,
@@ -180,6 +187,15 @@ export async function attachProfile(
     return attachProfileDB(source, target, data)
 }
 export { detachProfileDB as detachProfile } from '../../database/Persona/Persona.db'
+//#endregion
+
+//#region Post
+export { queryPostsDB } from '../../database'
+
+export async function queryPostHistoryByIdentifiers(netwrok: string, useIds: string[]) {
+    const posts = await queryPostsDB(netwrok)
+    return posts.filter((x) => useIds.includes(x.postBy.userId))
+}
 //#endregion
 
 //#region Relation
