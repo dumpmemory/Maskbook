@@ -1,7 +1,5 @@
 import type { RedPacketMetaKey, RedPacketNftMetaKey, SolanaRedPacketMetaKey } from '@masknet/shared-base'
 
-import type { RedPacketMetaKey } from '@masknet/shared-base'
-
 type WithoutChainId<T> = Omit<T, 'chain_id'>
 type WithNumberChainId<T> = WithoutChainId<T> & { chain_id: number }
 
@@ -410,7 +408,7 @@ export namespace FireflyRedPacketAPI {
             isRefunded: boolean
             claimedNumber: number
             claimedAmount: string
-        }
+        } | null
     }
     export type ParseResponse = FireflyResponse<ParseResult>
 
