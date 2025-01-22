@@ -1,4 +1,5 @@
 import type { ChainDescriptor } from '@masknet/web3-shared-base'
+import { NetworkType } from '@masknet/web3-shared-solana'
 
 export class ChainResolver<ChainId, SchemaType, NetworkType> {
     constructor(private readonly descriptors: () => ReadonlyArray<ChainDescriptor<ChainId, SchemaType, NetworkType>>) {}
@@ -36,6 +37,10 @@ export class ChainResolver<ChainId, SchemaType, NetworkType> {
     networkType(chainId: ChainId) {
         return this.getDescriptorRequired(chainId).type
     }
+    /**
+     * For Solana, it's the cluster.
+     * @returns 'mainnet-beta' | 'testnet' | 'devnet'
+     */
     network(chainId: ChainId) {
         return this.getDescriptorRequired(chainId).network
     }
@@ -58,7 +63,10 @@ export class ChainResolver<ChainId, SchemaType, NetworkType> {
         return this.getDescriptor(chainId)?.network === 'mainnet' || testnet
     }
     isMainnet(chainId: ChainId) {
-        return this.getDescriptor(chainId)?.network === 'mainnet'
+        const descriptor = this.getDescriptor(chainId)
+        if (!descriptor) return false
+        const { type, network } = descriptor
+        return type === NetworkType.Solana ? network === 'mainnet-beta' : network === 'mainnet'
     }
     isFeatureSupported(chainId: ChainId, feature: string) {
         return !!this.getDescriptor(chainId)?.features?.includes(feature)

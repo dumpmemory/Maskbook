@@ -1,6 +1,7 @@
 import { BN, web3 } from '@coral-xyz/anchor'
 import { ZERO } from '@masknet/web3-shared-base'
 import { ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync } from '@solana/spl-token'
+import type { Cluster } from '@solana/web3.js'
 import { BigNumber } from 'bignumber.js'
 import { getRpProgram } from './getRpProgram.js'
 import { getSolanaConnection } from './getSolanaProvider.js'
@@ -17,18 +18,19 @@ export async function createWithSplToken(
     pubkeyForClaimSignature: web3.PublicKey,
     author: string,
     message: string,
+    cluster: Cluster | undefined,
 ) {
     // Ensure the totalNumber and totalAmount are within the acceptable range
     if (totalNumber > MAX_NUM) {
         throw new Error(`Total number of red packets cannot exceed ${MAX_NUM}`)
     }
 
-    const program = await getRpProgram()
+    const program = await getRpProgram(cluster)
 
-    const tokenAccount = await getTokenAccount(tokenMint)
+    const tokenAccount = await getTokenAccount(tokenMint, cluster)
     if (!tokenAccount) throw new Error('Token account not found')
 
-    const tokenProgram = await getTokenProgram(tokenMint)
+    const tokenProgram = await getTokenProgram(tokenMint, cluster)
     if (!tokenProgram) throw new Error('Token program not found')
 
     const createTime = Math.floor(Date.now() / 1000)
@@ -81,20 +83,21 @@ export async function getEstimatedGasByCreateWithSplToken(
     pubkeyForClaimSignature: web3.PublicKey,
     message: string,
     author: string,
+    cluster: Cluster | undefined,
 ) {
     // Ensure the totalNumber and totalAmount are within the acceptable range
     if (totalNumber > MAX_NUM) {
         throw new Error(`Total number of red packets cannot exceed ${MAX_NUM}`)
     }
 
-    const program = await getRpProgram()
+    const program = await getRpProgram(cluster)
 
     const connection = await getSolanaConnection('devnet')
 
-    const tokenAccount = await getTokenAccount(tokenMint)
+    const tokenAccount = await getTokenAccount(tokenMint, cluster)
     if (!tokenAccount) throw new Error('Token account not found')
 
-    const tokenProgram = await getTokenProgram(tokenMint)
+    const tokenProgram = await getTokenProgram(tokenMint, cluster)
     if (!tokenProgram) throw new Error('Token program not found')
 
     const createTime = Math.floor(Date.now() / 1000)
