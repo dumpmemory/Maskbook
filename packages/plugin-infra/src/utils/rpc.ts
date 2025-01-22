@@ -9,13 +9,6 @@ const log: AsyncCallLogLevel = {
     requestReplay: process.env.NODE_ENV === 'development',
     sendLocalStack: process.env.NODE_ENV === 'development',
 }
-let isBackground = () => {
-    return isEnvironment(Environment.ManifestBackground)
-}
-
-export function __workaround__replaceIsBackground__(f: () => boolean) {
-    isBackground = f
-}
 
 function getPluginRPCInternal(
     cache: Map<string, object>,
@@ -41,11 +34,13 @@ function getPluginRPCInternal(
 const cache = new Map<string, object>()
 const cacheGenerator = new Map<string, object>()
 export function getPluginRPC<T>(pluginID: string): T {
-    if (isBackground()) startPluginRPC(pluginID, new AbortController().signal, Object.create(null))
+    if (isEnvironment(Environment.ManifestBackground))
+        startPluginRPC(pluginID, new AbortController().signal, Object.create(null))
     return getPluginRPCInternal(cache, pluginID, AsyncCall, '_') as T
 }
 export function getPluginRPCGenerator<T>(pluginID: string): T {
-    if (isBackground()) startPluginGeneratorRPC(pluginID, new AbortController().signal, Object.create(null))
+    if (isEnvironment(Environment.ManifestBackground))
+        startPluginGeneratorRPC(pluginID, new AbortController().signal, Object.create(null))
     return getPluginRPCInternal(cacheGenerator, pluginID, AsyncGeneratorCall, '$') as T
 }
 
@@ -57,7 +52,7 @@ function startPluginRPCInternal(
     starter: typeof AsyncCall | typeof AsyncGeneratorCall,
     entry: keyof RPCMessage,
 ) {
-    if (!isBackground()) throw new Error('Cannot start RPC in the UI.')
+    if (!isEnvironment(Environment.ManifestBackground)) throw new Error('Cannot start RPC in the UI.')
     const message = getPluginMessage<RPCMessage>(pluginID, DOMAIN_RPC)
     Promise.resolve(impl).catch((error) => {
         console.error('[@masknet/plugin-infra] Background service of plugin', pluginID, 'failed to start.', error)

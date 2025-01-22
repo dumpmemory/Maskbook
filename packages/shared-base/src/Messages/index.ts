@@ -6,8 +6,4 @@ import type { PluginMessageEmitter } from './CrossIsolationEvents.js'
 const m = new WebExtensionMessage<MaskEvents>({ domain: 'mask' })
 m.encoder = encoder
 
-export let MaskMessages: { readonly events: PluginMessageEmitter<MaskEvents> } = m
-
-export function __workaround__replaceImplementationOfMaskMessage__(msg: PluginMessageEmitter<any>) {
-    MaskMessages = { events: msg }
-}
+export const MaskMessages: { readonly events: PluginMessageEmitter<MaskEvents> } = m
