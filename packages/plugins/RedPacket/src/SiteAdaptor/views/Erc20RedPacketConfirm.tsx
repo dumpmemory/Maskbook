@@ -13,6 +13,7 @@ import { NetworkPluginID } from '@masknet/shared-base'
 import { ActionButton, makeStyles } from '@masknet/theme'
 import { useChainContext, useNativeTokenPrice, useWallet } from '@masknet/web3-hooks-base'
 import { EVMChainResolver, EVMExplorerResolver, FireflyRedPacket, SmartPayBundler } from '@masknet/web3-providers'
+import { FireflyRedPacketAPI } from '@masknet/web3-providers/types'
 import { isZero, rightShift } from '@masknet/web3-shared-base'
 import { Launch as LaunchIcon } from '@mui/icons-material'
 import { Link, Paper, Typography } from '@mui/material'
@@ -24,7 +25,7 @@ import { PreviewRedPacket } from '../components/PreviewRedPacket.js'
 import { ConditionType, useRedPacket } from '../contexts/RedPacketContext.js'
 import { useCreateFTRedpacketCallback } from '../hooks/useCreateFTRedpacketCallback.js'
 import { useHandleCreateOrSelect } from '../hooks/useHandleCreateOrSelect.js'
-import { FireflyRedPacketAPI } from '@masknet/web3-providers/types'
+import { formatTokenAmount } from '../helpers/formatTokenAmount.js'
 
 const useStyles = makeStyles()((theme) => ({
     message: {
@@ -162,7 +163,7 @@ export function Erc20RedPacketConfirm() {
                     name: token.name,
                     symbol: token.symbol,
                     decimals: token.decimals,
-                    amount: tokenQuantity ? rightShift(tokenQuantity, token.decimals).toString() : '0',
+                    amount: tokenQuantity ? rightShift(tokenQuantity, token.decimals).toFixed(0, 1) : '0',
                     icon: token.logoURL,
                 })) as FireflyRedPacketAPI.TokensStrategyPayload[],
             })
@@ -179,7 +180,7 @@ export function Erc20RedPacketConfirm() {
             })
         }
         return list
-    }, [needHoldingTokens, requiredTokens, tokenQuantity])
+    }, [needHoldingTokens, requiredTokens, requiredCollections, tokenQuantity])
 
     const currentIdentity = useCurrentVisitingIdentity()
     const me = useLastRecognizedIdentity()
@@ -322,7 +323,9 @@ export function Erc20RedPacketConfirm() {
                         <div className={classes.conditionGroup}>
                             <div className={classes.field}>
                                 <Typography component="span" className={classes.value}>
-                                    <Trans>Holding {tokenQuantity ? `${tokenQuantity}+` : 'any'}</Trans>
+                                    <Trans>
+                                        Holding {tokenQuantity ? `${formatTokenAmount(tokenQuantity, 0)}+` : 'any'}
+                                    </Trans>
                                 </Typography>
                             </div>
                             <div className={classes.field}>

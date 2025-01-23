@@ -4,10 +4,11 @@ import { FireflyRedPacketAPI } from '@masknet/web3-providers/types'
 import { Box, IconButton, Typography, type BoxProps } from '@mui/material'
 import { Trans } from '@lingui/react/macro'
 import { TokenIcon } from '@masknet/shared'
-import { formatBalance, isZero } from '@masknet/web3-shared-base'
+import { isZero } from '@masknet/web3-shared-base'
 import { NetworkPluginID } from '@masknet/shared-base'
+import { formatTokenAmount } from '../helpers/formatTokenAmount.js'
 
-const useStyles = makeStyles()((theme) => ({
+const useStyles = makeStyles<void, 'assetName'>()((theme, _, refs) => ({
     box: {
         backgroundColor: 'rgba(0, 0, 0, 0.1)',
         backdropFilter: 'blur(10px)',
@@ -16,13 +17,12 @@ const useStyles = makeStyles()((theme) => ({
         padding: theme.spacing(1.5),
         display: 'flex',
         flexDirection: 'column',
-        gap: theme.spacing(1),
     },
     header: {
-        fontSize: 24,
+        fontSize: 20,
         height: 20,
         fontWeight: 700,
-        paddingBottom: theme.spacing(2),
+        paddingBottom: theme.spacing(1),
         lineHeight: '120%',
         display: 'flex',
         alignItems: 'center',
@@ -65,7 +65,11 @@ const useStyles = makeStyles()((theme) => ({
     collections: {
         display: 'grid',
         gridTemplateColumns: 'repeat(2,1fr)',
-        gap: theme.spacing(1.5),
+        gap: theme.spacing(1),
+        [`& .${refs.assetName}`]: {
+            lineHeight: '18px',
+            height: 36,
+        },
     },
     asset: {
         display: 'flex',
@@ -114,7 +118,7 @@ export function Conditions({ onClose, statusList, unsatisfied = true, ...props }
     const { classes, cx } = useStyles()
     const tokenPayloads = statusList.find((x) => x.type === FireflyRedPacketAPI.StrategyType.tokens)?.payload
     const tokenPayload = tokenPayloads?.[0]
-    const quantity = tokenPayload ? formatBalance(tokenPayload.amount, tokenPayload.decimals) : ''
+    const quantity = tokenPayload ? formatTokenAmount(tokenPayload.amount, tokenPayload.decimals) : ''
 
     const collectionPayloads = statusList.find((x) => x.type === FireflyRedPacketAPI.StrategyType.nftOwned)?.payload
 
@@ -170,7 +174,7 @@ export function Conditions({ onClose, statusList, unsatisfied = true, ...props }
                                         name={collection.collectionName}
                                         chainId={Number.parseInt(collection.chainId, 10)}
                                         logoURL={collection.icon!}
-                                        size={36}
+                                        size={34}
                                         badgeSize={12}
                                     />
                                     <Typography className={classes.assetName}>{collection.collectionName}</Typography>

@@ -33,6 +33,7 @@ const useStyles = makeStyles()((theme) => {
             fontWeight: 700,
         },
         conditions: {
+            backgroundColor: theme.palette.maskColor.bottom,
             display: 'flex',
             flexDirection: 'column',
             gap: theme.spacing(1.5),
@@ -95,6 +96,11 @@ const useStyles = makeStyles()((theme) => {
             gap: '4px',
             flexFlow: 'row wrap',
         },
+        collections: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '4px',
+        },
         asset: {
             display: 'flex',
             alignItems: 'center',
@@ -106,6 +112,10 @@ const useStyles = makeStyles()((theme) => {
             fontWeight: 400,
             lineHeight: '20px',
             color: theme.palette.maskColor.main,
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
         },
         tokenIcon: {
             width: 24,
@@ -325,7 +335,7 @@ export function ConditionSettings(props: HTMLProps<HTMLDivElement>) {
                                         </ShadowRootTooltip>
                                     </Typography>
                                     {requiredCollections.length ?
-                                        <div className={classes.assets}>
+                                        <div className={classes.collections}>
                                             {requiredCollections.map((collection) => (
                                                 <div className={classes.asset} key={collection.address}>
                                                     <TokenIcon
@@ -334,7 +344,7 @@ export function ConditionSettings(props: HTMLProps<HTMLDivElement>) {
                                                         name={collection.name}
                                                         chainId={collection.chainId}
                                                         logoURL={collection.iconURL!}
-                                                        size={24}
+                                                        size={36}
                                                         badgeSize={12}
                                                     />
                                                     <Typography className={classes.assetName}>
@@ -353,6 +363,7 @@ export function ConditionSettings(props: HTMLProps<HTMLDivElement>) {
                                             >((resolve) => {
                                                 SelectNonFungibleContractModal.open({
                                                     pluginID: NetworkPluginID.PLUGIN_EVM,
+                                                    chainId,
                                                     multiple: true,
                                                     maxCollections: 4,
                                                     selectedCollections: requiredCollections,
