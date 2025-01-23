@@ -351,7 +351,7 @@ export const RedPacketRecord = memo(function RedPacketRecord({
                     }}>
                     {t`View`}
                 </ActionButton>
-            : redpacket_status && !(isViewStatus && !redpacketRecord) ?
+            : redpacket_status ?
                 <RedPacketActionButton
                     className={classes.actionButton}
                     redpacketStatus={redpacket_status}
@@ -371,6 +371,7 @@ export const RedPacketRecord = memo(function RedPacketRecord({
                     createdAt={create_time}
                     canResend={canResend}
                     canSend={canSend}
+                    transactionHash={history.trans_hash}
                     onResend={handleResend}
                 />
             :   null}
