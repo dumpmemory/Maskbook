@@ -25,7 +25,10 @@ const useStyles = makeStyles<{ isDim: boolean }>()((theme, { isDim }) => {
     }
 })
 
-export function RouterDialog(props: InjectedDialogProps & { pageMap: Record<RedPacketTabs, RoutePaths> }) {
+export function RouterDialog({
+    pageMap,
+    ...props
+}: InjectedDialogProps & { pageMap: Record<RedPacketTabs, RoutePaths> }) {
     const { pathname } = useLocation()
     const navigate = useNavigate()
     const theme = useTheme()
@@ -38,7 +41,7 @@ export function RouterDialog(props: InjectedDialogProps & { pageMap: Record<RedP
     }, [pathname === RoutePaths.Exit, props.onClose])
 
     const { classes } = useStyles({ isDim: mode === 'dim' })
-    const [currentTab, onChange] = usePageTab<RedPacketTabs>(props.pageMap)
+    const [currentTab, onChange] = usePageTab<RedPacketTabs>(pageMap)
 
     const createTabs = (
         <TabContext value={currentTab}>
