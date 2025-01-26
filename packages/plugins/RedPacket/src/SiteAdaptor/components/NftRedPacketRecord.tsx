@@ -81,8 +81,6 @@ const useStyles = makeStyles<{ background?: string; backgroundIcon?: string }>()
             },
         },
         icon: {
-            width: 18,
-            height: 18,
             marginLeft: 6,
             zIndex: -1,
         },
@@ -161,10 +159,10 @@ interface NftRedPacketRecordProps {
     collections: Array<NonFungibleCollection<ChainId, SchemaType>>
     onSend: (history: NftRedPacketJSONPayload, contract: NonFungibleCollection<ChainId, SchemaType>) => void
 }
-export const NftRedPacketRecord = memo(function NftRedPacketHistoryItem({
+export const NftRedPacketRecord = memo(function NftRedPacketRecord({
     history,
-    onSend,
     collections,
+    onSend,
 }: NftRedPacketRecordProps) {
     const { account, chainId } = useChainContext<NetworkPluginID.PLUGIN_EVM>()
     const [seen, ref] = useEverSeen<HTMLLIElement>()
@@ -257,6 +255,8 @@ export const NftRedPacketRecord = memo(function NftRedPacketHistoryItem({
                             </Trans>
                         </Typography>
                         <TokenIcon
+                            size={18}
+                            disableBadge
                             className={classes.icon}
                             address={collection?.address ?? ''}
                             name={collection?.name ?? '-'}
