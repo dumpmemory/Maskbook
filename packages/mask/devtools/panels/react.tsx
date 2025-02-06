@@ -142,7 +142,11 @@ export async function startReactDevTools(signal: AbortSignal) {
     function viewElementSourceFunction(source: any, symbolicalSource: any) {
         const { sourceURL, line, column } = symbolicalSource ? symbolicalSource : source
 
-        ;(browser.devtools.panels as any).openResource(sourceURL, line - 1, column - 1)
+        ;(browser.devtools.panels as any).openResource(
+            browser.runtime.getURL(sourceURL.replaceAll('/./', '/')),
+            line - 1,
+            column - 1,
+        )
     }
 
     // Note: since we manually passed bridge and wall, the first argument is unused in the implementation
