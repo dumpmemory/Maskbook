@@ -1,3 +1,6 @@
+import { Trans } from '@lingui/react/macro'
+import { Icons } from '@masknet/icons'
+import { EMPTY_LIST } from '@masknet/shared-base'
 import { ShadowRootTooltip, makeStyles, useBoundedPopperProps, useDetectOverflow } from '@masknet/theme'
 import {
     isENSContractAddress,
@@ -10,9 +13,6 @@ import {
 import { Button, Skeleton, Typography } from '@mui/material'
 import { memo, useCallback, useMemo, type HTMLProps, type ReactNode } from 'react'
 import { CollectibleCard, type CollectibleCardProps } from './CollectibleCard.js'
-import { Icons } from '@masknet/icons'
-import { EMPTY_LIST } from '@masknet/shared-base'
-import { Trans } from '@lingui/react/macro'
 
 const useStyles = makeStyles<void, 'action' | 'collectibleCard' | 'info'>()((theme, _, refs) => ({
     card: {
@@ -126,10 +126,10 @@ export const CollectibleItem = memo((props: CollectibleItemProps) => {
         disableAction = true,
         actionLabel,
         verifiedBy = EMPTY_LIST,
+        isSelected,
+        hideIndicator,
         onActionClick,
         onItemClick,
-        isSelected,
-        showUnCheckedIndicator,
         ...rest
     } = props
     const { classes, cx } = useStyles()
@@ -173,7 +173,7 @@ export const CollectibleItem = memo((props: CollectibleItemProps) => {
                     disableNetworkIcon={disableNetworkIcon}
                     onClick={handleClick}
                     isSelected={isSelected}
-                    showUnCheckedIndicator={showUnCheckedIndicator}
+                    hideIndicator={hideIndicator}
                 />
                 <div className={cx(classes.info, classes.ease)}>
                     {disableName ? null : (

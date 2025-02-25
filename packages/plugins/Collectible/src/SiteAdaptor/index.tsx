@@ -52,15 +52,17 @@ const TabConfig: Plugin.SiteAdaptor.ProfileTab = {
     UI: {
         TabContent({ socialAccount }) {
             const inspectCollectible = useInspectCollectible(socialAccount?.pluginID)
+            const handleItemClick = useCallback(
+                (asset: Web3Helper.NonFungibleAssetAll) => {
+                    inspectCollectible(asset, 'profileCard')
+                },
+                [inspectCollectible],
+            )
             if (!socialAccount) return null
             return (
                 <Web3ContextProvider network={socialAccount.pluginID}>
                     <UserAssetsProvider pluginID={socialAccount.pluginID} account={socialAccount.address}>
-                        <CollectionList
-                            gridProps={gridProps}
-                            from="web3Profile"
-                            onItemClick={(asset) => inspectCollectible(asset, 'web3Profile')}
-                        />
+                        <CollectionList gridProps={gridProps} from="web3Profile" onItemClick={handleItemClick} />
                     </UserAssetsProvider>
                 </Web3ContextProvider>
             )
@@ -108,6 +110,12 @@ const site: Plugin.SiteAdaptor.Definition = {
                 TabContent({ socialAccount }) {
                     const inspectCollectible = useInspectCollectible(socialAccount?.pluginID)
                     const { classes } = usePopupCollectionStyles()
+                    const handleItemClick = useCallback(
+                        (asset: Web3Helper.NonFungibleAssetAll) => {
+                            inspectCollectible(asset, 'profileCard')
+                        },
+                        [inspectCollectible],
+                    )
 
                     if (!socialAccount) return null
 
@@ -120,7 +128,7 @@ const site: Plugin.SiteAdaptor.Definition = {
                                     classes={{ sidebar: classes.sidebar }}
                                     disableWindowScroll
                                     from="profileCard"
-                                    onItemClick={(asset) => inspectCollectible(asset, 'profileCard')}
+                                    onItemClick={handleItemClick}
                                 />
                             </UserAssetsProvider>
                         </Web3ContextProvider>
