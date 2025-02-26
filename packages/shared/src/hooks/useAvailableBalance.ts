@@ -1,75 +1,93 @@
 import { NetworkPluginID } from '@masknet/shared-base'
-import type { Web3Helper } from '@masknet/web3-helpers'
 import {
     useChainContext,
     useFungibleTokenBalance,
     useMaskTokenAddress,
     useNativeTokenBalance,
-    useNetworkContext,
 } from '@masknet/web3-hooks-base'
-import { SmartPayBundler } from '@masknet/web3-providers'
+import { DepositPaymaster, SmartPayBundler } from '@masknet/web3-providers'
+import type { ConnectionOptions } from '@masknet/web3-providers/types'
 import { isGreaterThan, isSameAddress, toFixed, ZERO } from '@masknet/web3-shared-base'
 import {
     type ChainId,
-    DepositPaymaster,
+    formatEtherToWei,
     type GasConfig,
     GasEditor,
     isNativeTokenAddress,
 } from '@masknet/web3-shared-evm'
+import { useQuery } from '@tanstack/react-query'
 import { BigNumber } from 'bignumber.js'
 import { useMemo } from 'react'
-import { useAsync } from 'react-use'
 
-export function useAvailableBalance<S extends 'all' | void = void, T extends NetworkPluginID = NetworkPluginID>(
+export function useAvailableBalance<T extends NetworkPluginID = NetworkPluginID>(
+    pluginID: T,
     address?: string,
     gasOption?: GasConfig,
-    options?: Web3Helper.Web3ConnectionOptionsScope<S, T>,
+    options?: ConnectionOptions<T>,
 ) {
-    const { pluginID } = useNetworkContext()
     const { chainId } = useChainContext(options)
-    const { value: nativeTokenBalance = '0' } = useNativeTokenBalance()
-    const maskTokenAddress = useMaskTokenAddress()
-    const { value: maskBalance = '0' } = useFungibleTokenBalance(undefined, maskTokenAddress)
-
-    const { value: tokenBalance = '0' } = useFungibleTokenBalance(pluginID, address ?? '', {
+    const { value: nativeTokenBalance = '0' } = useNativeTokenBalance(pluginID, options)
+    const maskTokenAddress = useMaskTokenAddress(pluginID, options)
+    const { data: maskBalance = '0', isPending: isLoadingMaskBalance } = useFungibleTokenBalance(
+        undefined,
+        maskTokenAddress,
+    )
+    const { data: tokenBalance = '0', isPending: isLoadingTokenBalance } = useFungibleTokenBalance(pluginID, address, {
+        ...options,
         chainId,
     })
 
     // #region paymaster ratio
-    const { value: currencyRatio } = useAsync(async () => {
-        const chainId = await SmartPayBundler.getSupportedChainId()
-        const depositPaymaster = new DepositPaymaster(chainId)
-        const ratio = await depositPaymaster.getRatio()
+    const { data: currencyRatio, isLoading: loading } = useQuery({
+        queryKey: ['currency-ratio', chainId],
+        queryFn: async () => {
+            const chainId = await SmartPayBundler.getSupportedChainId()
+            const depositPaymaster = new DepositPaymaster(chainId)
+            const ratio = await depositPaymaster.getRatio()
 
-        return ratio
-    }, [])
+            return ratio
+        },
+    })
     // #endregion
 
     const gasFee = useMemo(() => {
+        if (pluginID === NetworkPluginID.PLUGIN_SOLANA && gasOption?.gas) return new BigNumber(gasOption.gas)
         if (!gasOption?.gas || pluginID !== NetworkPluginID.PLUGIN_EVM) return ZERO
         const result = GasEditor.fromConfig(chainId as ChainId, gasOption).getGasFee(gasOption.gas)
         if (!gasOption.gasCurrency || isNativeTokenAddress(gasOption.gasCurrency)) return result
         if (!currencyRatio) return ZERO
         return new BigNumber(toFixed(result.multipliedBy(currencyRatio), 0))
-    }, [gasOption, chainId])
+    }, [gasOption, chainId, pluginID])
+
+    const isGasFeeGreaterThanOneETH = useMemo(() => {
+        if (!gasOption?.gas || pluginID !== NetworkPluginID.PLUGIN_EVM) return false
+        return GasEditor.fromConfig(chainId as ChainId, gasOption)
+            .getGasFee(gasOption.gas)
+            .gte(formatEtherToWei(1))
+    }, [gasOption, chainId, pluginID])
 
     const isAvailableBalance = useMemo(
         () => isSameAddress(address, gasOption?.gasCurrency) || isNativeTokenAddress(address),
-        [address, gasOption?.gasCurrency],
+        [address, gasOption?.gasCurrency, pluginID],
     )
 
-    const isAvailableGasBalance = useMemo(() => {
+    const isGasSufficient = useMemo(() => {
+        if (pluginID !== NetworkPluginID.PLUGIN_EVM) return true
         if (!gasOption?.gasCurrency || isNativeTokenAddress(gasOption.gasCurrency))
             return isGreaterThan(nativeTokenBalance, gasFee)
 
         return isGreaterThan(maskBalance, gasFee)
-    }, [gasOption?.gasCurrency, nativeTokenBalance, maskBalance, gasFee])
+    }, [gasOption?.gasCurrency, nativeTokenBalance, maskBalance, gasFee, pluginID])
+
+    const balance =
+        isAvailableBalance ? BigNumber.max(new BigNumber(tokenBalance).minus(gasFee), 0).toString() : tokenBalance
 
     return {
         isAvailableBalance,
-        isAvailableGasBalance,
-        balance: isAvailableBalance
-            ? BigNumber.max(new BigNumber(tokenBalance).minus(gasFee), 0).toString()
-            : tokenBalance,
+        isGasSufficient,
+        isGasFeeGreaterThanOneETH,
+        gasFee,
+        balance,
+        isPending: isLoadingMaskBalance || isLoadingTokenBalance || loading,
     }
 }
