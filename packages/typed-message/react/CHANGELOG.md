@@ -1,5 +1,11 @@
 # @masknet/typed-message-react
 
+## 0.2.4
+
+### Patch Changes
+
+- 5032eb5: upgrade z-schema to 12
+
 ## 0.2.3
 
 ### Patch Changes
